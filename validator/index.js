@@ -1,0 +1,84 @@
+exports.createPostValidator = (req, res, next) => {
+    // Title
+    req.check('title', "Write a title").notEmpty()
+    req.check('title', "Title must be between 3 and 150 characters").isLength({
+        min: 3, 
+        max: 150
+    })
+    // Body
+    req.check('body', "Write some text").notEmpty()
+    req.check('body', "Body must be between 3 and 144 characters").isLength({
+        min: 3, 
+        max: 144
+    })
+    // Check for errors
+    const errors = req.validationErrors()
+    // If error show the first one as they happen 
+    if(errors){
+        const firstError = errors.map(error => error.msg)[0]
+        return res.status(400).json({error: firstError})
+    }
+    // Proceed to next middleware
+    next()
+}
+
+
+exports.userSignupValidator = (req, res, next) => {
+    // Name is not null and 3 to 10 characters
+    req.check('name', "name is required").notEmpty()
+    req.check('name', "name has to be at least three characters").isLength({
+        min: 3,
+        max: 200
+    })
+    // Email is not null, valid and normalized
+    req.check('email', "email must be between 3 to 32 characters").notEmpty()
+    .matches(/.+\@.+\..+/)
+    .withMessage("Email must contain @")
+    .isLength({
+        min: 3,
+        max: 200
+    })
+
+
+    // check for password
+    req.check("password", "Password is required").notEmpty()
+    req.check('password')
+        .isLength({
+            min: 6
+        })
+        .withMessage("Password must contain at least six characters")
+        .matches(/\d/)
+        .withMessage("Password must contain a number")
+
+    // Check for errors
+    const errors = req.validationErrors()
+    // If error show the first one as they happen 
+    if(errors){
+        const firstError = errors.map(error => error.msg)[0]
+        return res.status(400).json({error: firstError})
+    }
+    // Proceed to next middleware
+    next()
+    
+}
+
+exports.passwordResetValidator = (req, res, next) => {
+    // check for password
+    req.check("newPassword", "Password is required").notEmpty();
+    req.check("newPassword")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 chars long")
+        .matches(/\d/)
+        .withMessage("must contain a number")
+        .withMessage("Password must contain a number");
+ 
+    // check for errors
+    const errors = req.validationErrors();
+    // if error show the first one as they happen
+    if (errors) {
+        const firstError = errors.map(error => error.msg)[0];
+        return res.status(400).json({ error: firstError });
+    }
+    // proceed to next middleware or ...
+    next();
+};
